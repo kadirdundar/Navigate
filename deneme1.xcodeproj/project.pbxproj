@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3F5C6C2B298BFB510066D4E1 /* girisVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F5C6C2A298BFB510066D4E1 /* girisVC.swift */; };
+		3F5C6C2D298BFDB80066D4E1 /* navigasyonVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F5C6C2C298BFDB80066D4E1 /* navigasyonVC.swift */; };
 		3FDC1BEF298806E10004D17D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FDC1BEE298806E10004D17D /* AppDelegate.swift */; };
 		3FDC1BF1298806E10004D17D /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FDC1BF0298806E10004D17D /* SceneDelegate.swift */; };
 		3FDC1BF3298806E10004D17D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FDC1BF2298806E10004D17D /* ViewController.swift */; };
@@ -16,6 +18,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3F5C6C2A298BFB510066D4E1 /* girisVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = girisVC.swift; sourceTree = "<group>"; };
+		3F5C6C2C298BFDB80066D4E1 /* navigasyonVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = navigasyonVC.swift; sourceTree = "<group>"; };
 		3FDC1BEB298806E10004D17D /* deneme1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = deneme1.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FDC1BEE298806E10004D17D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3FDC1BF0298806E10004D17D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -59,6 +63,8 @@
 				3FDC1BEE298806E10004D17D /* AppDelegate.swift */,
 				3FDC1BF0298806E10004D17D /* SceneDelegate.swift */,
 				3FDC1BF2298806E10004D17D /* ViewController.swift */,
+				3F5C6C2A298BFB510066D4E1 /* girisVC.swift */,
+				3F5C6C2C298BFDB80066D4E1 /* navigasyonVC.swift */,
 				3FDC1BF4298806E10004D17D /* Main.storyboard */,
 				3FDC1BF7298806E20004D17D /* Assets.xcassets */,
 				3FDC1BF9298806E20004D17D /* LaunchScreen.storyboard */,
@@ -140,7 +146,9 @@
 			files = (
 				3FDC1BF3298806E10004D17D /* ViewController.swift in Sources */,
 				3FDC1BEF298806E10004D17D /* AppDelegate.swift in Sources */,
+				3F5C6C2D298BFDB80066D4E1 /* navigasyonVC.swift in Sources */,
 				3FDC1BF1298806E10004D17D /* SceneDelegate.swift in Sources */,
+				3F5C6C2B298BFB510066D4E1 /* girisVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
