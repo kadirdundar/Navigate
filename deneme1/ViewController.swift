@@ -19,11 +19,24 @@ class ViewController: UIViewController {
        func createPath(sourceLocation : CLLocationCoordinate2D, destinationLocation : CLLocationCoordinate2D) {
            let sourcePlaceMark = MKPlacemark(coordinate: sourceLocation, addressDictionary: nil)//istenilen konumu MKPlacemark nesnesine dönüştürdük
            let destinationPlaceMark = MKPlacemark(coordinate: destinationLocation, addressDictionary: nil)
-           
+           let location3 = CLLocationCoordinate2D(latitude: 41.03, longitude: 28.89)
+           let location4 = CLLocationCoordinate2D(latitude: 41.04, longitude: 28.86)
            
            let sourceMapItem = MKMapItem(placemark: sourcePlaceMark)//MKPlacemark'ı  MKItem nesnesine dönüştürdük
            let destinationItem = MKMapItem(placemark: destinationPlaceMark)
            
+           let location3Placemark = MKPlacemark(coordinate: location3, addressDictionary: nil)
+           let location4Placemark = MKPlacemark(coordinate: location4, addressDictionary: nil)
+           
+           let location3Annotation = MKPointAnnotation()
+           location3Annotation.coordinate = location3
+           location3Annotation.title = "Location 3"
+           location3Annotation.subtitle = "subtitle for location 3"
+
+           let location4Annotation = MKPointAnnotation()
+           location4Annotation.coordinate = location4
+           location4Annotation.title = "Location 4"
+           location4Annotation.subtitle = "subtitle for location 4"
            
            let sourceAnotation = MKPointAnnotation()//annotationların nasıl görüneceğini belirledik
            sourceAnotation.title = "Deneme1"
@@ -40,7 +53,7 @@ class ViewController: UIViewController {
                destinationAnotation.coordinate = location.coordinate
            }
            
-           self.mapView.showAnnotations([sourceAnotation, destinationAnotation], animated: true)
+           self.mapView.showAnnotations([sourceAnotation, destinationAnotation, location3Annotation, location4Annotation], animated: true)
            
            
            
@@ -62,6 +75,9 @@ class ViewController: UIViewController {
                
                
                let route = response.routes[0]
+               for step in route.steps {
+                           print(step.instructions)
+                       }
                               self.mapView.addOverlay(route.polyline, level: MKOverlayLevel.aboveRoads)
                               
                               let rect = route.polyline.boundingMapRect

@@ -1,16 +1,9 @@
-//
-//  navigasyonVC.swift
-//  deneme1
-//
-//  Created by Kadir Dündar on 2.02.2023.
-//
-
 import UIKit
 import MapKit
 import CoreLocation
 
-class navigasyonVC: UIViewController {
-
+class navigasyonVC: UIViewController, CLLocationManagerDelegate {
+    
     override func viewDidLoad() {
         
         let location1 = CLLocationCoordinate2D(latitude: 41.034755, longitude: 28.861355)
@@ -21,26 +14,64 @@ class navigasyonVC: UIViewController {
         let location6 = CLLocationCoordinate2D(latitude: 41.05, longitude: 28.87)
         let location7 = CLLocationCoordinate2D(latitude: 41.03, longitude: 28.90)
         let location8 = CLLocationCoordinate2D(latitude: 41.01, longitude: 28.85)
-            
+        
+        let currentLocation = CLLocationManager()
+        
         openInMap(locations: [location1, location2, location3,location4, location5, location6, location7, location8])
         
         super.viewDidLoad()
-
         
+        currentLocation.delegate = self
     }
     
+    
+    
     func openInMap(locations: [CLLocationCoordinate2D]) {
-        var mapItems: [MKMapItem] = []
+        let locationManager = CLLocationManager()
+        locationManager.requestWhenInUseAuthorization()
+        
+        var currentLocation = CLLocation()
+        if CLLocationManager.authorizationStatus() == .authorizedWhenInUse {
+            currentLocation = locationManager.location!
+        }
+        
+        var distances: [(location: CLLocationCoordinate2D, distance: CLLocationDistance)] = []
         for location in locations {
-            let destinationPlaceMark = MKPlacemark(coordinate: location, addressDictionary: nil)
+            
+         
+            let distance = CLLocation(latitude: location.latitude, longitude: location.longitude).distance(from: currentLocation)
+            distances.append((location: location, distance: distance))
+            
+        }
+        
+        distances.sort(by: { $0.distance < $1.distance })
+        
+        var degisken = currentLocation
+        
+        for (index, (location,_)) in distances.enumerated() {
+            
+            
+            let distance = CLLocation(latitude: location.latitude, longitude: location.longitude).distance(from: degisken)
+            distances[index].distance = distance
+            
+            distances.sort(by: { $0.distance < $1.distance })
+            
+            degisken = CLLocation(latitude: location.latitude, longitude: location.longitude)
+            
+        }
+        
+        
+        var mapItems: [MKMapItem] = []
+        for distance in distances {
+            let gec = currentLocation
+            
+            let destinationPlaceMark = MKPlacemark(coordinate: distance.location, addressDictionary: nil)
             let destinationItem = MKMapItem(placemark: destinationPlaceMark)
             mapItems.append(destinationItem)
         }
-
+        
         let launchOptions = [MKLaunchOptionsDirectionsModeKey : MKLaunchOptionsDirectionsModeDriving]
-
+        
         MKMapItem.openMaps(with: mapItems, launchOptions: launchOptions)
     }
-
-
 }
