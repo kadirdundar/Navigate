@@ -36,36 +36,39 @@ class navigasyonVC: UIViewController, CLLocationManagerDelegate {
         }
         
         var distances: [(location: CLLocationCoordinate2D, distance: CLLocationDistance)] = []
-        for location in locations {
-            
-         
+        for location in locations {// ilk durağı belirlemek için
             let distance = CLLocation(latitude: location.latitude, longitude: location.longitude).distance(from: currentLocation)
             distances.append((location: location, distance: distance))
-            
         }
         
         distances.sort(by: { $0.distance < $1.distance })
         
-        var degisken = currentLocation
+        var mapItems: [MKMapItem] = []
+        var visitedLocations: [CLLocationCoordinate2D] = []
+        visitedLocations.append(distances[0].location)
         
-        for (index, (location,_)) in distances.enumerated() {
+        while visitedLocations.count != locations.count {// ilk duraktan sonraki durakları belirlemek için
+            var closestLocation = CLLocationCoordinate2D(latitude: 0, longitude: 0)
+            var closestDistance = Double.greatestFiniteMagnitude
             
+            for (location, _) in distances where !visitedLocations.contains(where: { $0 == location }) {
+                let lastVisitedLocation = visitedLocations[visitedLocations.count - 1]
+                let currentDistance = CLLocation(latitude: location.latitude, longitude: location.longitude).distance(from: CLLocation(latitude: lastVisitedLocation.latitude, longitude: lastVisitedLocation.longitude))
+                
+                if currentDistance < closestDistance {
+                    closestLocation = location
+                    closestDistance = currentDistance
+                }
+            }
             
-            let distance = CLLocation(latitude: location.latitude, longitude: location.longitude).distance(from: degisken)
-            distances[index].distance = distance
-            
-            distances.sort(by: { $0.distance < $1.distance })
-            
-            degisken = CLLocation(latitude: location.latitude, longitude: location.longitude)
-            
+            visitedLocations.append(closestLocation)
         }
         
+        let addKonum = CLLocationCoordinate2D(latitude: currentLocation.coordinate.latitude, longitude: currentLocation.coordinate.longitude)
+        visitedLocations.insert(addKonum, at: 0)// yol tarifinin kullanıcının konumunda başlaması için ekledik
         
-        var mapItems: [MKMapItem] = []
-        for distance in distances {
-            let gec = currentLocation
-            
-            let destinationPlaceMark = MKPlacemark(coordinate: distance.location, addressDictionary: nil)
+        for location in visitedLocations {
+            let destinationPlaceMark = MKPlacemark(coordinate: location, addressDictionary: nil)
             let destinationItem = MKMapItem(placemark: destinationPlaceMark)
             mapItems.append(destinationItem)
         }
@@ -73,5 +76,12 @@ class navigasyonVC: UIViewController, CLLocationManagerDelegate {
         let launchOptions = [MKLaunchOptionsDirectionsModeKey : MKLaunchOptionsDirectionsModeDriving]
         
         MKMapItem.openMaps(with: mapItems, launchOptions: launchOptions)
+    }
+
+}
+
+extension CLLocationCoordinate2D: Equatable {
+    public static func == (lhs: CLLocationCoordinate2D, rhs: CLLocationCoordinate2D) -> Bool {
+        return lhs.latitude == rhs.latitude && lhs.longitude == rhs.longitude
     }
 }
