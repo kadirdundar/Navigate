@@ -14,11 +14,21 @@ class navigasyonVC: UIViewController, CLLocationManagerDelegate {
         let location6 = CLLocationCoordinate2D(latitude: 41.05, longitude: 28.87)
         let location7 = CLLocationCoordinate2D(latitude: 41.03, longitude: 28.90)
         let location8 = CLLocationCoordinate2D(latitude: 41.01, longitude: 28.85)
+        let location9 = CLLocationCoordinate2D(latitude: 41.06, longitude: 28.86)
+        let location10 = CLLocationCoordinate2D(latitude: 41.07, longitude: 28.89)
+        let location11 = CLLocationCoordinate2D(latitude: 41.05, longitude: 28.88)
+        let location12 = CLLocationCoordinate2D(latitude: 41.04, longitude: 28.84)
+        let location13 = CLLocationCoordinate2D(latitude: 41.02, longitude: 28.86)
+        let location14 = CLLocationCoordinate2D(latitude: 41.01, longitude: 28.89)
+        let location15 = CLLocationCoordinate2D(latitude: 41.03, longitude: 28.86)
+        let location16 = CLLocationCoordinate2D(latitude: 41.06, longitude: 28.88)
+        let location17 = CLLocationCoordinate2D(latitude: 41.05, longitude: 28.90)
+        let location18 = CLLocationCoordinate2D(latitude: 41.04, longitude: 28.89)
         
         let currentLocation = CLLocationManager()
         
-        openInMap(locations: [location1, location2, location3,location4, location5, location6, location7, location8])
-        
+        openInMap(locations: [location1, location2, location3, location4, location5, location6, location7, location8, location9, location10, location11, location12, location13, location14])
+        //, location13, location14, location15, location16, location17, location18
         super.viewDidLoad()
         
         currentLocation.delegate = self
