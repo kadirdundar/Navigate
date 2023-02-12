@@ -25,16 +25,56 @@ class navigasyonVC: UIViewController, CLLocationManagerDelegate {
         let location17 = CLLocationCoordinate2D(latitude: 41.05, longitude: 28.90)
         let location18 = CLLocationCoordinate2D(latitude: 41.04, longitude: 28.89)
         
+        let locations = [CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
+                         CLLocationCoordinate2D(latitude: 37.8074, longitude: -122.2719),
+                         CLLocationCoordinate2D(latitude: 37.7648, longitude: -122.4230),
+                         CLLocationCoordinate2D(latitude: 37.7880, longitude: -122.3995)]
+        
         let currentLocation = CLLocationManager()
         
-        openInMap(locations: [location1, location2, location3, location4, location5, location6, location7, location8, location9, location10, location11, location12, location13, location14])
-        //, location13, location14, location15, location16, location17, location18
+        //openInMap(locations: [location1, location2, location3, location4, location5, location6, location7, location8, location9, location10, location11, location12, location13, location14])
+      
+        deneme(locations:locations)
         super.viewDidLoad()
         
         currentLocation.delegate = self
     }
     
-    
+    func deneme(locations: [CLLocationCoordinate2D]){
+  
+        
+
+
+        let locations = [CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
+                         CLLocationCoordinate2D(latitude: 37.8074, longitude: -122.2719),
+                         CLLocationCoordinate2D(latitude: 37.7648, longitude: -122.4230),
+                         CLLocationCoordinate2D(latitude: 37.7880, longitude: -122.3995)]
+
+        let apiKey = "apiKey"
+   
+        let baseURL = "https://api.mapbox.com/optimized-trips/v1/mapbox/driving/"
+
+        let coordinates = locations.map({ "\($0.longitude),\($0.latitude)" }).joined(separator: ";")
+        let requestURL = "\(baseURL)\(coordinates)?access_token=\(apiKey)"
+
+        let task = URLSession.shared.dataTask(with: URL(string: requestURL)!) { (data, response, error) in
+            if let error = error {
+                print("Error fetching optimized locations: \(error)")
+                return
+            }
+            
+            guard let data = data, let response = response as? HTTPURLResponse, (200 ..< 300) ~= response.statusCode else {
+                print("Invalid response")
+                return
+            }
+            
+            let json = try? JSONSerialization.jsonObject(with: data, options: [])
+            print(json)
+        }
+
+        task.resume()
+
+    }
     
     func openInMap(locations: [CLLocationCoordinate2D]) {
         let locationManager = CLLocationManager()

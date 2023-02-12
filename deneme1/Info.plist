@@ -2,21 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>we use your location for navigate</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>we use your location for navigate</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleExecutable</key>
-	<string></string>
-	<key>CFBundleIdentifier</key>
-	<string></string>
+	<key>MBXAccessToken</key>
+	<string>pk.eyJ1IjoiZHVuZGFya2FkaXIiLCJhIjoiY2xkeWw0NzE2MGp6dTN3cDZ2cnJiMWRmMiJ9.YH-Io4lFMhf6uISQhQGfVA</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
-		<key>UIApplicationSupportsTabbedSceneCollection</key>
-		<false/>
 		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UIApplicationSupportsTabbedSceneCollection</key>
 		<false/>
 		<key>UISceneConfigurations</key>
 		<dict>
