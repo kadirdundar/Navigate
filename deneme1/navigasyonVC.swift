@@ -40,17 +40,9 @@ class navigasyonVC: UIViewController, CLLocationManagerDelegate {
         currentLocation.delegate = self
     }
     
-    func deneme(locations: [CLLocationCoordinate2D]){
-  
-        
-
-
-        let locations = [CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
-                         CLLocationCoordinate2D(latitude: 37.8074, longitude: -122.2719),
-                         CLLocationCoordinate2D(latitude: 37.7648, longitude: -122.4230),
-                         CLLocationCoordinate2D(latitude: 37.7880, longitude: -122.3995)]
-
-        let apiKey = "apiKey"
+    func deneme(locations: [CLLocationCoordinate2D])-> ([[Double]]){
+        var locationList: [[Double]] = []
+        let apiKey = "pk.eyJ1IjoiZHVuZGFya2FkaXIiLCJhIjoiY2xkeWxscWU0MHNnejN4cHJ6dXA2Nzh0bSJ9.FGnJNBYwhbiAP8dr2ELI3A"
    
         let baseURL = "https://api.mapbox.com/optimized-trips/v1/mapbox/driving/"
 
@@ -68,15 +60,36 @@ class navigasyonVC: UIViewController, CLLocationManagerDelegate {
                 return
             }
             
-            let json = try? JSONSerialization.jsonObject(with: data, options: [])
-            print(json)
+            let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+            
+            if let waypoints = json?["waypoints"] as? [[String: Any]] {
+                
+                var waypointDictionary = [Int: [String: Any]]()
+
+                for waypoint in waypoints {
+                    let index = waypoint["waypoint_index"] as! Int
+                    let location = waypoint["location"] as! [Double]
+                    waypointDictionary[index] = ["location": location]
+                }
+                
+                
+
+                let sortedKeys = waypointDictionary.keys.sorted()
+                for key in sortedKeys {
+                    let location = waypointDictionary[key]!["location"]!
+                    locationList.append(location as! [Double])
+                }
+
+                print(locationList)
+                //print(waypointDictionary)
+            }
         }
 
         task.resume()
-
+        return locationList
     }
     
-    func openInMap(locations: [CLLocationCoordinate2D]) {
+    func addFirstLocation(locations: [CLLocationCoordinate2D])-> CLLocationCoordinate2D{
         let locationManager = CLLocationManager()
         locationManager.requestWhenInUseAuthorization()
         
@@ -92,6 +105,8 @@ class navigasyonVC: UIViewController, CLLocationManagerDelegate {
         }
         
         distances.sort(by: { $0.distance < $1.distance })
+        let firstElement = distances[0].location
+        
         
         var mapItems: [MKMapItem] = []
         var visitedLocations: [CLLocationCoordinate2D] = []
@@ -126,7 +141,9 @@ class navigasyonVC: UIViewController, CLLocationManagerDelegate {
         let launchOptions = [MKLaunchOptionsDirectionsModeKey : MKLaunchOptionsDirectionsModeDriving]
         
         MKMapItem.openMaps(with: mapItems, launchOptions: launchOptions)
+        return firstElement
     }
+   
 
 }
 
