@@ -15,19 +15,15 @@ class ViewController: UIViewController {
             CLLocationCoordinate2D(latitude: 41.031211, longitude: 28.951211),
             CLLocationCoordinate2D(latitude: 41.030411, longitude: 28.892311),
             CLLocationCoordinate2D(latitude: 41.038111, longitude: 28.887611),
-            CLLocationCoordinate2D(latitude: 41.041511, longitude: 28.932111),
-            CLLocationCoordinate2D(latitude: 41.020211, longitude: 28.904211),
-            CLLocationCoordinate2D(latitude: 41.037111, longitude: 28.919511),
-            CLLocationCoordinate2D(latitude: 41.014211, longitude: 28.894611),
-            CLLocationCoordinate2D(latitude: 41.035611, longitude: 28.907611),
-            CLLocationCoordinate2D(latitude: 41.044811, longitude: 28.882211)]
+            CLLocationCoordinate2D(latitude: 41.041511, longitude: 28.932111)
+]
 
     
         createPaths(locations: locations)
            
            self.mapView.delegate = self
        }
-    func addFirstLocation(locations: [CLLocationCoordinate2D])-> CLLocationCoordinate2D{
+    func addFirstAndLastLocation(locations: [CLLocationCoordinate2D])-> (first: CLLocationCoordinate2D, last: CLLocationCoordinate2D)? {
         
         let locationManager = CLLocationManager()
         locationManager.requestWhenInUseAuthorization()
@@ -45,30 +41,50 @@ class ViewController: UIViewController {
         
         distances.sort(by: { $0.distance < $1.distance })
         let firstElement = distances[0].location
-        
-        return firstElement
+        let lastElement = distances[distances.count - 1].location
+        print(distances)
+      
+        return (firstElement, lastElement)
     }
+
     func deneme(locations: [CLLocationCoordinate2D], completion : @escaping([CLLocationCoordinate2D]?)->())-> ([CLLocationCoordinate2D]){//konumları sıralamak için istek
         var locationList: [[Double]] = []
         var newList = [CLLocationCoordinate2D]()
         
-        let element = self.addFirstLocation(locations: locations)
+        let element = addFirstAndLastLocation(locations: locations)
         for loc in locations{
-            if loc != element{
+            if loc != element?.first && loc != element?.last{
                 newList.append(loc)
-                //print(newList)
+                
             }
         }
+        print(newList)
+        print("012012010201010210010101001011")
+        if let firstElement = element?.first {
+            newList.insert(firstElement, at: 0)
+        }
+
+        // Set the last element of newList to element.last
+        if let lastElement = element?.last {
+            newList.append(lastElement)
+        }
+        print(newList)
+        print("222222222222222222222")
         
-        let apiKey = ""
+        let apiKey = "*"
    
         let baseURL = "https://api.mapbox.com/optimized-trips/v1/mapbox/driving/"
-
+    
+        // Rota üzerindeki duraklar
         let coordinates = newList.map({ "\($0.longitude),\($0.latitude)" }).joined(separator: ";")
-        let requestURL = "\(baseURL)\(coordinates)?access_token=\(apiKey)"
+        print(coordinates)
+        print("3333333333333333333")
+        // API isteği için URL oluşturma
+        let params = "source=first&destination=last&roundtrip=false"
 
+      
+        let requestURL = "\(baseURL)\(coordinates)?\(params)&access_token=\(apiKey)"
         let task = URLSession.shared.dataTask(with: URL(string: requestURL)!) { (data, response, error) in
-            
             if let error = error {
                 print("Error fetching optimized locations: \(error)")
                 return
@@ -76,10 +92,12 @@ class ViewController: UIViewController {
             
             guard let data = data, let response = response as? HTTPURLResponse, (200 ..< 300) ~= response.statusCode else {
                 print("Invalid response")
+                
                 return
             }
             
             let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+            
             
             if let waypoints = json?["waypoints"] as? [[String: Any]] {
                 
@@ -109,13 +127,11 @@ class ViewController: UIViewController {
                 }
                         
                 
-                //newList.insert(element, at: 0)
-                completion(newList)
-                print("----")
-                print(newList)
                 
-            }
-          
+                    completion(newList)
+                } else {
+                    completion(nil)
+                }
         }
         task.resume()
      
@@ -132,7 +148,7 @@ class ViewController: UIViewController {
                 locationss = locations
             }
         }
-        sleep(1)
+       
         print("*-*-*-*-*-*-*-*-*--*-*-**--*-*-*-*")
        print(locationss)
         
