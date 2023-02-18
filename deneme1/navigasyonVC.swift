@@ -151,3 +151,9 @@ extension CLLocationCoordinate2D: Equatable {
         return lhs.latitude == rhs.latitude && lhs.longitude == rhs.longitude
     }
 }
+func forDecision(locations : [CLLocationCoordinate2D]){
+    if locations.count >= 12{
+        
+    }
+    
+}

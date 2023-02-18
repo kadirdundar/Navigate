@@ -15,14 +15,27 @@ class ViewController: UIViewController {
             CLLocationCoordinate2D(latitude: 41.031211, longitude: 28.951211),
             CLLocationCoordinate2D(latitude: 41.030411, longitude: 28.892311),
             CLLocationCoordinate2D(latitude: 41.038111, longitude: 28.887611),
-            CLLocationCoordinate2D(latitude: 41.041511, longitude: 28.932111)
+            CLLocationCoordinate2D(latitude: 41.041511, longitude: 28.932111),
+            CLLocationCoordinate2D(latitude: 41.034611, longitude: 28.898711),
+            CLLocationCoordinate2D(latitude: 41.045811, longitude: 28.883611),
+            CLLocationCoordinate2D(latitude: 41.028511, longitude: 28.876611),
+            CLLocationCoordinate2D(latitude: 41.024111, longitude: 28.905911),
+            CLLocationCoordinate2D(latitude: 41.037911, longitude: 28.923611)
 ]
 
     
         createPaths(locations: locations)
+        /*deneme(locations: locations) { locations in
+            if let locations = locations{
+                print(locations)
+                print("basarili")
+            }
+        }*/
            
            self.mapView.delegate = self
        }
+    
+  
     func addFirstAndLastLocation(locations: [CLLocationCoordinate2D])-> (first: CLLocationCoordinate2D, last: CLLocationCoordinate2D)? {
         
         let locationManager = CLLocationManager()
@@ -71,7 +84,7 @@ class ViewController: UIViewController {
         print(newList)
         print("222222222222222222222")
         
-        let apiKey = "*"
+        let apiKey = ""
    
         let baseURL = "https://api.mapbox.com/optimized-trips/v1/mapbox/driving/"
     
@@ -138,7 +151,6 @@ class ViewController: UIViewController {
         return newList
     }
 
-        
     func createPaths(locations: [CLLocationCoordinate2D]) {
         
         
@@ -146,51 +158,51 @@ class ViewController: UIViewController {
         deneme(locations: locations) { locations in
             if let locations = locations{
                 locationss = locations
+                
+                for i in 0..<locationss.count-1 {
+                  let sourceLocation = locationss[i]
+                  let destinationLocation = locationss[i+1]
+
+                  let sourcePlaceMark = MKPlacemark(coordinate: sourceLocation, addressDictionary: nil)
+                  let destinationPlaceMark = MKPlacemark(coordinate: destinationLocation, addressDictionary: nil)
+
+                  let sourceMapItem = MKMapItem(placemark: sourcePlaceMark)
+                  let destinationItem = MKMapItem(placemark: destinationPlaceMark)
+
+                  let directionRequest = MKDirections.Request()
+                  directionRequest.source = sourceMapItem
+                  directionRequest.destination = destinationItem
+                  directionRequest.transportType = .automobile
+
+
+                  let direction = MKDirections(request: directionRequest)
+
+                  direction.calculate { (response, error) in
+                    guard let response = response else {
+                      if let error = error {
+                        print("ERROR FOUND : \(error.localizedDescription)")
+                      }
+                      return
+                    }
+
+                    let route = response.routes[0]
+                    self.mapView.addOverlay(route.polyline, level: MKOverlayLevel.aboveRoads)
+                      
+                      for (index, location) in locationss.enumerated() {
+                          let annotation = MKPointAnnotation()
+                          annotation.coordinate = location
+                          annotation.title = "Durak \(index + 1)"
+                          annotation.subtitle = "Durak açıklaması"
+                          self.mapView.addAnnotation(annotation)
+                      }
+
+                  }
+                }
             }
         }
        
-        print("*-*-*-*-*-*-*-*-*--*-*-**--*-*-*-*")
-       print(locationss)
         
-      for i in 0..<locationss.count-1 {
-        let sourceLocation = locationss[i]
-        let destinationLocation = locationss[i+1]
-
-        let sourcePlaceMark = MKPlacemark(coordinate: sourceLocation, addressDictionary: nil)
-        let destinationPlaceMark = MKPlacemark(coordinate: destinationLocation, addressDictionary: nil)
-
-        let sourceMapItem = MKMapItem(placemark: sourcePlaceMark)
-        let destinationItem = MKMapItem(placemark: destinationPlaceMark)
-
-        let directionRequest = MKDirections.Request()
-        directionRequest.source = sourceMapItem
-        directionRequest.destination = destinationItem
-        directionRequest.transportType = .automobile
-
-
-        let direction = MKDirections(request: directionRequest)
-
-        direction.calculate { (response, error) in
-          guard let response = response else {
-            if let error = error {
-              print("ERROR FOUND : \(error.localizedDescription)")
-            }
-            return
-          }
-
-          let route = response.routes[0]
-          self.mapView.addOverlay(route.polyline, level: MKOverlayLevel.aboveRoads)
-            
-            for (index, location) in locationss.enumerated() {
-                let annotation = MKPointAnnotation()
-                annotation.coordinate = location
-                annotation.title = "Durak \(index + 1)"
-                annotation.subtitle = "Durak açıklaması"
-                self.mapView.addAnnotation(annotation)
-            }
-
-        }
-      }
+     
         
     }
 
