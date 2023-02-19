@@ -20,23 +20,65 @@ class ViewController: UIViewController {
             CLLocationCoordinate2D(latitude: 41.045811, longitude: 28.883611),
             CLLocationCoordinate2D(latitude: 41.028511, longitude: 28.876611),
             CLLocationCoordinate2D(latitude: 41.024111, longitude: 28.905911),
-            CLLocationCoordinate2D(latitude: 41.037911, longitude: 28.923611)
-]
+            CLLocationCoordinate2D(latitude: 41.037911, longitude: 28.923611),
+            CLLocationCoordinate2D(latitude: 41.045831, longitude: 28.883621),
+            CLLocationCoordinate2D(latitude: 41.028513, longitude: 28.876641),
+            CLLocationCoordinate2D(latitude: 41.024161, longitude: 28.905951),
+            CLLocationCoordinate2D(latitude: 41.037971, longitude: 28.923641)]
 
     
-        createPaths(locations: locations)
-        /*deneme(locations: locations) { locations in
-            if let locations = locations{
-                print(locations)
-                print("basarili")
-            }
-        }*/
-           
+            decision(location: locations)
            self.mapView.delegate = self
        }
-    
-  
+    func decision(location: [CLLocationCoordinate2D]){
+        let number = location.count
+        if number >= 12{
+            let sorted = orderLocations(locations: location)
+            var firstList = [CLLocationCoordinate2D]()
+            var secondList = [CLLocationCoordinate2D]()
+            var midIndex = number / 2  // Listenin orta noktasının indeksi
+
+            // Eğer eleman sayısı tek ise, orta elemanın indeksini hesapla
+            if number % 2 != 0 {
+                midIndex = (number - 1) / 2
+            }
+
+            for i in 0..<midIndex {
+                firstList.append(sorted[i].location)
+            }
+            for i in midIndex..<number {
+                secondList.append(sorted[i].location)
+            }
+            let firstRoute = deneme(locations: firstList) { location in
+                if let location = location {
+                    firstList = location
+                    let secondRoute = self.deneme(locations: secondList) { location in
+                        if let location = location{
+                            secondList = location
+                            for i in 0...secondList.count-1{
+                                firstList.append(secondList[i])
+                            }
+                            self.direction(locations: firstList)
+                        }
+                        
+                    }
+                }
+            }
+        }
+        else{
+            createPaths(locations: location)
+        }
+        
+    }
     func addFirstAndLastLocation(locations: [CLLocationCoordinate2D])-> (first: CLLocationCoordinate2D, last: CLLocationCoordinate2D)? {
+        let distances = orderLocations(locations: locations)
+        let firstElement = distances[0].location
+        let lastElement = distances[distances.count - 1].location
+        
+        return (firstElement, lastElement)
+        
+    }
+    func orderLocations(locations: [CLLocationCoordinate2D])-> [(location: CLLocationCoordinate2D, distance: CLLocationDistance)]{
         
         let locationManager = CLLocationManager()
         locationManager.requestWhenInUseAuthorization()
@@ -53,11 +95,10 @@ class ViewController: UIViewController {
         }
         
         distances.sort(by: { $0.distance < $1.distance })
-        let firstElement = distances[0].location
-        let lastElement = distances[distances.count - 1].location
+        
         print(distances)
       
-        return (firstElement, lastElement)
+        return distances
     }
 
     func deneme(locations: [CLLocationCoordinate2D], completion : @escaping([CLLocationCoordinate2D]?)->())-> ([CLLocationCoordinate2D]){//konumları sıralamak için istek
@@ -138,9 +179,7 @@ class ViewController: UIViewController {
                     newList.append(element)
                     
                 }
-                        
-                
-                
+                    
                     completion(newList)
                 } else {
                     completion(nil)
@@ -159,54 +198,50 @@ class ViewController: UIViewController {
             if let locations = locations{
                 locationss = locations
                 
-                for i in 0..<locationss.count-1 {
-                  let sourceLocation = locationss[i]
-                  let destinationLocation = locationss[i+1]
-
-                  let sourcePlaceMark = MKPlacemark(coordinate: sourceLocation, addressDictionary: nil)
-                  let destinationPlaceMark = MKPlacemark(coordinate: destinationLocation, addressDictionary: nil)
-
-                  let sourceMapItem = MKMapItem(placemark: sourcePlaceMark)
-                  let destinationItem = MKMapItem(placemark: destinationPlaceMark)
-
-                  let directionRequest = MKDirections.Request()
-                  directionRequest.source = sourceMapItem
-                  directionRequest.destination = destinationItem
-                  directionRequest.transportType = .automobile
-
-
-                  let direction = MKDirections(request: directionRequest)
-
-                  direction.calculate { (response, error) in
-                    guard let response = response else {
-                      if let error = error {
-                        print("ERROR FOUND : \(error.localizedDescription)")
-                      }
-                      return
-                    }
-
-                    let route = response.routes[0]
-                    self.mapView.addOverlay(route.polyline, level: MKOverlayLevel.aboveRoads)
-                      
-                      for (index, location) in locationss.enumerated() {
-                          let annotation = MKPointAnnotation()
-                          annotation.coordinate = location
-                          annotation.title = "Durak \(index + 1)"
-                          annotation.subtitle = "Durak açıklaması"
-                          self.mapView.addAnnotation(annotation)
-                      }
-
-                  }
-                }
+                self.direction(locations: locationss)
             }
         }
-       
-        
-     
-        
     }
+    func direction(locations: [CLLocationCoordinate2D]){
+        for i in 0..<locations.count-1 {
+          let sourceLocation = locations[i]
+          let destinationLocation = locations[i+1]
+
+          let sourcePlaceMark = MKPlacemark(coordinate: sourceLocation, addressDictionary: nil)
+          let destinationPlaceMark = MKPlacemark(coordinate: destinationLocation, addressDictionary: nil)
+
+          let sourceMapItem = MKMapItem(placemark: sourcePlaceMark)
+          let destinationItem = MKMapItem(placemark: destinationPlaceMark)
+
+          let directionRequest = MKDirections.Request()
+          directionRequest.source = sourceMapItem
+          directionRequest.destination = destinationItem
+          directionRequest.transportType = .automobile
 
 
+          let direction = MKDirections(request: directionRequest)
+
+          direction.calculate { (response, error) in
+            guard let response = response else {
+              if let error = error {
+                print("ERROR FOUND : \(error.localizedDescription)")
+              }
+              return
+            }
+
+            let route = response.routes[0]
+            self.mapView.addOverlay(route.polyline, level: MKOverlayLevel.aboveRoads)
+              
+              for (index, location) in locations.enumerated() {
+                  let annotation = MKPointAnnotation()
+                  annotation.coordinate = location
+                  annotation.title = "Durak \(index + 1)"
+                  annotation.subtitle = "Durak açıklaması"
+                  self.mapView.addAnnotation(annotation)
+              }
+          }
+        }
+    }
    }
 
    extension ViewController : MKMapViewDelegate {
