@@ -156,11 +156,17 @@ class ViewController: UIViewController {
             if let waypoints = json?["waypoints"] as? [[String: Any]] {
                 
                 var waypointDictionary = [Int: [String: Any]]()
+                var mostFarLocation = 0.0
+                
 
                 for waypoint in waypoints {
                     let index = waypoint["waypoint_index"] as! Int
                     let location = waypoint["location"] as! [Double]
                     waypointDictionary[index] = ["location": location]
+                    let distance = waypoint["disatnce"] as! Double
+                    if distance > mostFarLocation{// eğer son konum API dan gelen en uzak mesafeyle aynıysa dokunma değilse son konumu değşitir ve tekrar istek gönder.
+                        mostFarLocation = distance
+                    }
                 }
                 print(waypointDictionary)
                 print("*****************")
