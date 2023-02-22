@@ -32,30 +32,30 @@ class ViewController: UIViewController {
        }
     func decision(location: [CLLocationCoordinate2D]){
         let number = location.count
-        if number >= 12{
+        if number > 12{
             let sorted = orderLocations(locations: location)
             var firstList = [CLLocationCoordinate2D]()
             var secondList = [CLLocationCoordinate2D]()
-            var midIndex = number / 2  // Listenin orta noktasının indeksi
-
+            var midIndex = number - 10 // Listenin orta noktasının indeksi
+            let numberr = 10 + midIndex
             // Eğer eleman sayısı tek ise, orta elemanın indeksini hesapla
-            if number % 2 != 0 {
-                midIndex = (number - 1) / 2
-            }
+            
 
-            for i in 0..<midIndex {
+            for i in 0..<10 {
                 firstList.append(sorted[i].location)
             }
-            for i in midIndex..<number {
+            for i in 10..<numberr {
                 secondList.append(sorted[i].location)
             }
+            
             let firstRoute = deneme(locations: firstList) { location in
                 if let location = location {
+                    
                     firstList = location
                     let secondRoute = self.deneme(locations: secondList) { location in
                         if let location = location{
                             secondList = location
-                            for i in 0...secondList.count-1{
+                            for i in 0...secondList.count-1{// eğer son konum API dan gelen cevaptaki en uzak konumla son konum eşit değilse son konumu değiştirip tekrar istek yolla
                                 firstList.append(secondList[i])
                             }
                             self.direction(locations: firstList)
@@ -101,7 +101,7 @@ class ViewController: UIViewController {
         return distances
     }
 
-    func deneme(locations: [CLLocationCoordinate2D], completion : @escaping([CLLocationCoordinate2D]?)->())-> ([CLLocationCoordinate2D]){//konumları sıralamak için istek
+    func deneme(locations: [CLLocationCoordinate2D], completion : @escaping([CLLocationCoordinate2D]?)->()){//konumları sıralamak için istek
         var locationList: [[Double]] = []
         var newList = [CLLocationCoordinate2D]()
         
@@ -156,17 +156,13 @@ class ViewController: UIViewController {
             if let waypoints = json?["waypoints"] as? [[String: Any]] {
                 
                 var waypointDictionary = [Int: [String: Any]]()
-                var mostFarLocation = 0.0
                 
 
                 for waypoint in waypoints {
                     let index = waypoint["waypoint_index"] as! Int
                     let location = waypoint["location"] as! [Double]
                     waypointDictionary[index] = ["location": location]
-                    let distance = waypoint["disatnce"] as! Double
-                    if distance > mostFarLocation{// eğer son konum API dan gelen en uzak mesafeyle aynıysa dokunma değilse son konumu değşitir ve tekrar istek gönder.
-                        mostFarLocation = distance
-                    }
+                    
                 }
                 print(waypointDictionary)
                 print("*****************")
@@ -193,12 +189,53 @@ class ViewController: UIViewController {
         }
         task.resume()
      
-        return newList
+        
     }
-
+    func controlLastLocation(locations: [CLLocationCoordinate2D])-> [Double]{
+        var mostFarLocation = [Double]()
+        var mostFarDistance = 0.0
+        
+        let apiKey = ""
+        let baseURL = "https://api.mapbox.com/optimized-trips/v1/mapbox/driving/"
+        // Rota üzerindeki duraklar
+        let coordinates = locations.map({ "\($0.longitude),\($0.latitude)" }).joined(separator: ";")
+        print(coordinates)
+        print("3333333333333333333")
+        // API isteği için URL oluşturma
+        let params = "source=first&destination=last&roundtrip=false"
+        
+        let requestURL = "\(baseURL)\(coordinates)?\(params)&access_token=\(apiKey)"
+        let task = URLSession.shared.dataTask(with: URL(string: requestURL)!) { (data, response, error) in
+            if let error = error {
+                print("Error fetching optimized locations: \(error)")
+                return
+            }
+            
+            guard let data = data, let response = response as? HTTPURLResponse, (200 ..< 300) ~= response.statusCode else {
+                print("Invalid response")
+                
+                return
+            }
+            
+            let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+            if let waypoints = json?["waypoints"] as? [[String: Any]] {
+                
+                var waypointDictionary = [Int: [String: Any]]()
+                
+                for waypoint in waypoints {
+                    let index = waypoint["waypoint_index"] as! Int
+                    let location = waypoint["location"] as! [Double]
+                    waypointDictionary[index] = ["location": location]
+                    let distance = waypoint["disatnce"] as! Double
+                    if distance > mostFarDistance{// eğer son konum API dan gelen en uzak mesafeyle aynıysa dokunma ,değilse son konumu değşitir ve tekrar istek gönder.
+                        mostFarLocation = location
+                    }
+                }}}
+        return mostFarLocation
+    }
+        
     func createPaths(locations: [CLLocationCoordinate2D]) {
-        
-        
+                
         var locationss = [CLLocationCoordinate2D]()
         deneme(locations: locations) { locations in
             if let locations = locations{
